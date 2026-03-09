@@ -1,0 +1,14 @@
+Django>=5.0,<6.0
+# Use psycopg2 (compiled) instead of psycopg2-binary — libpq-dev is in the Dockerfile
+psycopg2>=2.9.9
+gunicorn>=21.2.0
+python-dotenv>=1.0.0
+Pillow>=10.0.0
+django-allauth[socialaccount]>=65.0.0
+django-crispy-forms>=2.1
+crispy-tailwind>=0.5.0
+django-q2>=1.7.0
+django-jazzmin>=3.0
+requests>=2.31.0
+PyJWT>=2.8.0
+cryptography>=42.0.0
