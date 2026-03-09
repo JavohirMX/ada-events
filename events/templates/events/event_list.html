@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Events - ADA Bali Events{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12">
+    <!-- Header & Filters -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6 mb-8 sm:mb-10 md:mb-12">
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Discover Events</h1>
+        
+        <form method="get"
+              data-mobile-discovery-filters="true"
+              x-data="{ mobileFiltersOpen: false, selectedCategory: '{{ selected_category|escapejs }}' }"
+              @keydown.escape.window="mobileFiltersOpen = false"
+              class="w-full md:w-auto max-w-md md:max-w-none flex items-center gap-2 p-2 sm:p-1.5 sm:gap-3 bg-white/90 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800 rounded-2xl sm:rounded-full shadow-sm">
+
+            <!-- Single source of truth for category (used by both desktop select & mobile pills) -->
+            <input type="hidden" name="category" :value="selectedCategory">
+
+            <!-- Search input -->
+            <div class="relative flex-1 min-w-0" data-mobile-filter-search="true">
+                <label for="search-events" class="sr-only">Search events</label>
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="search-events" type="text" name="q" value="{{ search_query }}" placeholder="Search events…" class="w-full sm:min-w-[180px] pl-9 pr-3 py-2.5 min-h-11 bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl sm:rounded-full focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+            </div>
+
+            <!-- Mobile: search submit icon button -->
+            <button type="submit"
+                    class="sm:hidden shrink-0 w-11 h-11 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center active:scale-95 transition-transform"
+                    aria-label="Search">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </button>
+
+            <!-- Mobile: filter icon button -->
+            <button type="button"
+                    data-mobile-filter-trigger="true"
+                    @click="mobileFiltersOpen = true"
+                    class="sm:hidden relative shrink-0 w-11 h-11 rounded-xl border border-gray-200/80 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-600 dark:text-gray-300 flex items-center justify-center active:scale-95 transition-transform"
+                    aria-label="Filter events">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                <span x-show="selectedCategory" {% if not selected_category %}style="display:none"{% endif %} class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-black dark:bg-white" aria-hidden="true"></span>
+            </button>
+
+            <!-- Desktop: separator -->
+            <div class="hidden sm:block h-6 w-px bg-gray-200 dark:bg-zinc-700" aria-hidden="true"></div>
+
+            <!-- Desktop: category select (no name attr — hidden input is the actual field) -->
+            <div class="hidden sm:block w-full sm:w-auto" data-mobile-filter-category="true">
+                <label for="category-filter" class="sr-only">Category</label>
+                <select id="category-filter"
+                        @change="selectedCategory = $event.target.value"
+                        class="w-full sm:w-auto bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl sm:rounded-full focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-medium text-gray-700 dark:text-gray-300 py-2.5 min-h-11 pl-3 pr-8 cursor-pointer appearance-none">
+                    <option value="" class="dark:bg-zinc-800">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.name }}" class="dark:bg-zinc-800" {% if selected_category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Desktop: action buttons -->
+            <div class="hidden sm:flex sm:items-center gap-2" data-mobile-filter-actions="true">
+                <!-- Date range -->
+                <div class="hidden sm:flex items-center gap-1">
+                    <label for="date-from" class="sr-only">From date</label>
+                    <input id="date-from" type="date" name="date_from" value="{{ date_from }}"
+                           class="py-2 px-3 min-h-11 bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
+                           aria-label="From date">
+                    <span class="text-gray-400 dark:text-gray-500 text-xs font-medium px-1">–</span>
+                    <label for="date-to" class="sr-only">To date</label>
+                    <input id="date-to" type="date" name="date_to" value="{{ date_to }}"
+                           class="py-2 px-3 min-h-11 bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
+                           aria-label="To date">
+                </div>
+                <button type="submit"
+                        data-mobile-filter-submit="true"
+                        class="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black px-5 py-2.5 min-h-11 rounded-xl sm:rounded-full text-sm font-semibold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    Filter
+                </button>
+                {% if selected_category or search_query or date_from or date_to %}
+                    <a href="{% url 'events:event_list' %}"
+                       @click="selectedCategory = ''"
+                       data-mobile-filter-clear="true"
+                       class="w-full sm:w-auto text-center px-4 py-2.5 min-h-11 rounded-xl sm:rounded-full border border-gray-200/80 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center justify-center">Reset</a>
+                {% else %}
+                    <button type="button" disabled aria-disabled="true"
+                            data-mobile-filter-clear="true"
+                            class="w-full sm:w-auto text-center px-4 py-2.5 min-h-11 rounded-xl sm:rounded-full border border-gray-200/80 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed flex items-center justify-center">Reset</button>
+                {% endif %}
+            </div>
+
+            <!-- Mobile: bottom sheet -->
+            <div class="sm:hidden" data-mobile-filter-sheet="true">
+                <!-- Backdrop -->
+                <div x-show="mobileFiltersOpen"
+                     style="display:none"
+                     @click="mobileFiltersOpen = false"
+                     class="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
+                     x-transition:enter="transition-opacity ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition-opacity ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     aria-hidden="true"></div>
+
+                <!-- Panel -->
+                <div x-show="mobileFiltersOpen"
+                     style="display:none"
+                     data-mobile-filter-panel="true"
+                     class="fixed inset-x-0 bottom-0 z-[80] px-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="translate-y-full"
+                     x-transition:enter-end="translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="translate-y-0"
+                     x-transition:leave-end="translate-y-full"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-label="Filter events">
+                    <div class="max-w-md mx-auto rounded-3xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
+                        <!-- Drag handle -->
+                        <div class="pt-3 pb-0 flex justify-center" aria-hidden="true">
+                            <div class="w-10 h-1 rounded-full bg-gray-300 dark:bg-zinc-600"></div>
+                        </div>
+
+                        <div class="p-5 pt-4">
+                            <!-- Sheet header -->
+                            <div class="flex items-center justify-between mb-5">
+                                <h2 class="text-base font-bold text-gray-900 dark:text-white">Filter Events</h2>
+                                <button type="button"
+                                        @click="mobileFiltersOpen = false"
+                                        class="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 flex items-center justify-center transition-colors"
+                                        aria-label="Close filters">
+                                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                                </button>
+                            </div>
+
+                            <!-- Category label -->
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Category</p>
+
+                            <!-- Category pills -->
+                            <div class="flex flex-wrap gap-2" data-mobile-filter-category="true" role="group" aria-label="Select category">
+                                <button type="button"
+                                        @click="selectedCategory = ''"
+                                        :class="selectedCategory === '' ? 'bg-black dark:bg-white text-white dark:text-black shadow-sm' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'"
+                                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors min-h-[38px]"
+                                        :aria-pressed="selectedCategory === ''">
+                                    All
+                                </button>
+                                {% for cat in categories %}
+                                <button type="button"
+                                        @click="selectedCategory = '{{ cat.name|escapejs }}'"
+                                        :class="selectedCategory === '{{ cat.name|escapejs }}' ? 'bg-black dark:bg-white text-white dark:text-black shadow-sm' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'"
+                                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors min-h-[38px]"
+                                        :aria-pressed="selectedCategory === '{{ cat.name|escapejs }}'">
+                                    {{ cat.name }}
+                                </button>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Date Range -->
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mt-5 mb-3">Date Range</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label for="mobile-date-from" class="block text-xs text-gray-500 dark:text-gray-400 mb-1">From</label>
+                                    <input id="mobile-date-from" type="date" name="date_from" value="{{ date_from }}"
+                                           class="w-full py-2.5 px-3 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none">
+                                </div>
+                                <div>
+                                    <label for="mobile-date-to" class="block text-xs text-gray-500 dark:text-gray-400 mb-1">To</label>
+                                    <input id="mobile-date-to" type="date" name="date_to" value="{{ date_to }}"
+                                           class="w-full py-2.5 px-3 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none">
+                                </div>
+                            </div>
+
+                            <!-- Sheet action buttons -->
+                            <div class="grid grid-cols-2 gap-2 mt-6" data-mobile-filter-actions="true">
+                                <button type="submit"
+                                        data-mobile-filter-submit="true"
+                                        @click="mobileFiltersOpen = false"
+                                        class="w-full min-h-11 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-semibold flex items-center justify-center active:scale-95 transition-transform">
+                                    Apply
+                                </button>
+                                <button type="button"
+                                        data-mobile-filter-clear="true"
+                                        @click="selectedCategory = ''; mobileFiltersOpen = false; $nextTick(() => $el.closest('form').submit())"
+                                        :disabled="!selectedCategory && !{{ search_query|yesno:'true,false' }}"
+                                        :class="(selectedCategory || {{ search_query|yesno:'true,false' }}) ? 'cursor-pointer text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800' : 'cursor-not-allowed text-gray-400 dark:text-gray-500 border-gray-200/80 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800'"
+                                        class="w-full min-h-11 rounded-xl border text-sm font-medium flex items-center justify-center transition-colors">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if events %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for event in events %}
+                {% include 'events/partials/event_card.html' with event=event variant='upcoming' show_rsvp=True today=today tomorrow=tomorrow %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-24 bg-white dark:bg-zinc-900 rounded-[32px] border border-gray-100 dark:border-zinc-800 shadow-sm mt-8">
+            <div class="w-20 h-20 mx-auto bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+                <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No events found</h3>
+            <p class="text-gray-500 dark:text-gray-300 mb-6">Try adjusting your filters or search terms.</p>
+            {% if selected_category or search_query %}
+                <a href="{% url 'events:event_list' %}" class="text-primary-600 hover:text-primary-700 font-medium">Clear all filters</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

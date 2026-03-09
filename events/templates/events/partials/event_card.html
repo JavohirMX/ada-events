@@ -1,0 +1,144 @@
+<article data-event-card="true" class="group relative isolate flex flex-col h-full bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden">
+
+    {# ── Image / Fallback area ─────────────────────────────────────── #}
+    <div class="relative w-full aspect-[4/3] overflow-hidden">
+        {% if event.image %}
+            <img src="{{ event.image.url }}" alt="{{ event.title }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+        {% else %}
+            {# Neutral bg — only circle + icon carry category colour #}
+            <div class="absolute inset-0 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
+                {# Coloured pill / circle container #}
+                <div class="relative flex items-center justify-center w-24 h-24 rounded-full"
+                     {% if event.category and event.category.icon %}data-card-fallback-icon="{{ event.category.icon }}"{% endif %}
+                     {% if event.category %}style="background-color: {{ event.category.color }}22; color: {{ event.category.color }};"
+                     {% else %}style="background-color: #6b728022; color: #6b7280;"{% endif %}>
+
+                    {# Category-specific icons ───── #}
+                    {% if event.category and event.category.icon %}
+                        <i data-lucide="{{ event.category.icon }}" class="w-12 h-12"></i>
+                    {% else %}
+                        {# Calendar — generic / fallback #}
+                        <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                        </svg>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {# Category badge #}
+        {% if event.category %}
+            <div class="absolute top-3 left-3 z-20 pointer-events-none">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full border backdrop-blur-sm text-gray-900 dark:text-gray-100"
+                      style="border-color: {{ event.category.color }}80; background-color: {{ event.category.color }}22;">
+                    {{ event.category.name }}
+                </span>
+            </div>
+        {% endif %}
+
+        {# Date badge #}
+        <div class="absolute top-3 right-3 text-center z-20 pointer-events-none">
+            <div class="bg-white/90 dark:bg-black/60 backdrop-blur-sm border border-white/40 dark:border-white/10 rounded-2xl shadow-sm px-3 py-2 min-w-[3.5rem]">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ event.event_date|date:"M" }}</div>
+                <div class="text-xl font-extrabold text-gray-900 dark:text-white leading-none">{{ event.event_date|date:"d" }}</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Card body ─────────────────────────────────────────────────── #}
+    <div class="p-5 flex flex-col flex-1">
+
+        
+        <h3 class="text-base font-bold text-gray-900 dark:text-white leading-snug mb-2.5 line-clamp-2">
+            <a data-card-link="true"
+               href="{% url 'events:event_detail' event.slug %}"
+               class="after:absolute after:inset-0 after:z-[1] after:rounded-3xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-black dark:focus-visible:after:ring-white">
+                {{ event.title }}
+            </a>
+        </h3>
+
+        <div class="space-y-1.5">
+            <p class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <svg class="w-3.5 h-3.5 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="truncate">{{ event.event_date|date:"l" }}{% if event.event_time %} · {{ event.event_time|time:"g:i A" }}{% endif %}</span>
+            </p>
+            <p class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <svg class="w-3.5 h-3.5 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="truncate">{{ event.location }}</span>
+            </p>
+        </div>
+
+        {# Status chips #}
+        <div class="flex flex-wrap gap-1.5 mt-3 min-h-6">
+            {% if variant == 'past' %}
+                <span data-card-status="ended" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+                    Past
+                </span>
+            {% else %}
+                {% if event.event_date == today %}
+                    <span data-card-status="today" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
+                        <svg class="w-3 h-3 animate-pulse" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+                        Today
+                    </span>
+                {% elif event.event_date == tomorrow %}
+                    <span data-card-status="tomorrow" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+                        Tomorrow
+                    </span>
+                {% endif %}
+                {% if event.is_full %}
+                    <span data-card-status="full" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+                        Full
+                    </span>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="h-px w-full bg-gray-100 dark:bg-zinc-800 my-3.5"></div>
+
+        {# ── Bottom action row — relative so z-index lifts above stretched link #}
+        <div class="relative z-[2] mt-auto flex items-center justify-between gap-3">
+            {# Attendee count — X / Y when capped #}
+            <span class="text-xs text-gray-400 dark:text-gray-500 font-medium tabular-nums">
+                <span class="font-semibold text-gray-600 dark:text-gray-300">{{ event.attendee_count }}</span>{% if event.max_attendees %}<span>/{{ event.max_attendees }}</span>{% endif %}
+                {% if variant == 'past' %}attended{% else %}going{% endif %}
+            </span>
+
+            <div class="flex items-center gap-2">
+                {# Details link — relative keeps it above stretched link #}
+                <a href="{% url 'events:event_detail' event.slug %}"
+                   class="relative inline-flex items-center justify-center min-h-10 px-4 py-2 rounded-full text-xs font-semibold text-gray-700 dark:text-gray-200 ring-1 ring-inset ring-gray-200 dark:ring-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white">
+                    Details
+                </a>
+
+                {# RSVP — only on upcoming cards #}
+                {% if show_rsvp and variant != 'past' %}
+                    {% if user.is_authenticated %}
+                        <form data-card-rsvp="true" class="relative" action="{% url 'events:rsvp' event.slug %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="going">
+                            <button type="submit"
+                                    {% if event.is_full %}disabled{% endif %}
+                                    class="inline-flex items-center justify-center min-h-10 px-4 py-2 rounded-full text-xs font-semibold bg-black dark:bg-white text-white dark:text-black hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white">
+                                RSVP
+                            </button>
+                        </form>
+                    {% else %}
+                        <a data-card-rsvp-login="true"
+                           href="{% url 'account_login' %}?next={% url 'events:event_detail' event.slug %}"
+                           class="relative inline-flex items-center justify-center min-h-10 px-4 py-2 rounded-full text-xs font-semibold bg-black dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white">
+                            RSVP
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</article>
