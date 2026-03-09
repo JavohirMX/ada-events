@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Email - ADA Bali Events{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-6 lg:px-8 py-16 lg:py-24">
+    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[32px] p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] text-center">
+        <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        
+        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-4">Verify Your Email</h1>
+        <p class="text-gray-600 dark:text-gray-300 mb-8">We've sent an email to your address. Please follow the instructions to verify your account.</p>
+        
+        <a href="{% url 'home' %}" class="w-full inline-block bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700 px-8 py-3.5 rounded-full font-semibold text-lg transition-all">
+            Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

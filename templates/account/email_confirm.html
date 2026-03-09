@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Email - ADA Bali Events{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-6 lg:px-8 py-16 lg:py-24">
+    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-[32px] p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] text-center">
+        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-4">Confirm Email Address</h1>
+        
+        {% if confirmation %}
+            <p class="text-gray-600 dark:text-gray-300 mb-8">Please confirm that <span class="font-bold text-gray-900 dark:text-white">{{ confirmation.email_address.email }}</span> is an email address for user {{ confirmation.email_address.user.username }}.</p>
+            
+            <form class="auth-form" method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-black dark:bg-white text-white dark:text-black hover:scale-[1.02] active:scale-95 px-8 py-3.5 rounded-full font-semibold text-lg transition-all shadow-lg hover:shadow-xl">
+                    Confirm Email
+                </button>
+            </form>
+        {% else %}
+            <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 mb-8">This email confirmation link has expired or is invalid.</p>
+            <a href="{% url 'account_email' %}" class="w-full inline-block bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700 px-8 py-3.5 rounded-full font-semibold text-lg transition-all">
+                Request a new confirmation email
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
