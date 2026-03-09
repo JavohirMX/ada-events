@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ADA Bali Events{% endblock %}
+
+{% block content %}
+<div data-mobile-dashboard-shell="true" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+    <div class="flex items-center justify-between mb-8 sm:mb-10">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Dashboard</h1>
+    </div>
+    
+    <!-- Bento Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        
+        <!-- Top Profile Card (Spans 2 cols) -->
+        <div class="md:col-span-2 bg-gradient-to-br from-[#1B5D52] via-[#3C7564] to-[#57AA97] max-h-fit rounded-2xl sm:rounded-[32px] p-5 sm:p-7 text-white relative overflow-hidden shadow-sm">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-[#EBF1F0]/25 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex items-center gap-4 sm:gap-5">
+                <!-- Avatar -->
+                <div class="shrink-0">
+                    {% if user.profile_photo %}
+                        <img src="{{ user.profile_photo.url }}" alt="{{ user.username }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-white/25 shadow-lg">
+                    {% else %}
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border-4 border-white/25 shadow-lg">
+                            <span class="text-2xl sm:text-3xl font-bold">{{ user.username|upper|slice:":1" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Name / username / bio -->
+                <div class="flex-1 min-w-0">
+                    <p class="text-lg sm:text-xl font-extrabold leading-tight truncate">
+                        {% if user.first_name or user.last_name %}
+                            {{ user.first_name }} {{ user.last_name }}
+                        {% else %}
+                            {{ user.username }}
+                        {% endif %}
+                    </p>
+                    <p class="text-sm text-white/65 font-medium mt-0.5">@{{ user.username }}</p>
+                    {% if user.bio %}
+                        <p class="text-sm text-white/75 mt-2 line-clamp-2 leading-relaxed">{{ user.bio }}</p>
+                    {% endif %}
+                    <a href="{% url 'users:profile_edit' %}" class="mt-3 sm:mt-4 bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-2 rounded-full text-sm font-semibold transition-colors inline-flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Bento -->
+        <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm flex flex-col justify-center">
+            <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Activity</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 dark:bg-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center transition-transform hover:-translate-y-1">
+                    <p class="text-2xl sm:text-3xl font-extrabold text-primary-600 dark:text-primary-400 mb-1">{{ user.created_events.count }}</p>
+                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Created</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center transition-transform hover:-translate-y-1">
+                    <p class="text-2xl sm:text-3xl font-extrabold text-green-600 dark:text-green-400 mb-1">{{ user.rsvps.count }}</p>
+                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">RSVPs</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications Bento -->
+        <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+                <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Notifications</h2>
+                {% if notifications_unread_count %}
+                    <span class="bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold px-2.5 py-0.5 rounded-full">{{ notifications_unread_count }} new</span>
+                {% endif %}
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center text-center">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                </div>
+                <a href="{% url 'users:notifications_inbox' %}" class="inline-flex items-center justify-center w-full py-2.5 sm:py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white rounded-xl font-semibold text-sm transition-colors mt-auto">
+                    View Inbox →
+                </a>
+            </div>
+        </div>
+
+        <!-- Attending Events Bento (Spans 2 cols) -->
+        <div class="md:col-span-2 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Events I'm Attending</h2>
+            </div>
+            
+            {% if attending_rsvps %}
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {% for rsvp in attending_rsvps %}
+                        <a href="{% url 'events:event_detail' rsvp.event.slug %}" class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+                            <div class="bg-gray-100 dark:bg-zinc-800 rounded-lg sm:rounded-xl w-12 h-12 sm:w-14 sm:h-14 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-[9px] sm:text-[10px] font-bold text-red-500 dark:text-red-400 uppercase leading-none mb-1">{{ rsvp.event.event_date|date:"M" }}</span>
+                                <span class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white leading-none">{{ rsvp.event.event_date|date:"d" }}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-gray-900 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    {{ rsvp.event.title }}
+                                </h3>
+                                <div class="flex items-center text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span class="truncate">{{ rsvp.event.location }}</span>
+                                </div>
+                            </div>
+                            <div class="shrink-0 flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold 
+                                {% if rsvp.status == 'going' %}bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400
+                                {% elif rsvp.status == 'maybe' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400
+                                {% else %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400{% endif %}">
+                                {{ rsvp.get_status_display }}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12 bg-gray-50 dark:bg-zinc-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-700">
+                    <p class="text-gray-600 dark:text-gray-300 font-medium pt-3">You're not attending any upcoming events.</p>
+                    <a href="{% url 'events:event_list' %}" class="inline-block mt-3 text-primary-600 dark:text-primary-400 font-semibold hover:underline">Discover events</a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- My Created Events Bento (Spans 3 cols on desktop) -->
+        <div class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-6 gap-2 sm:gap-3">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">My Upcoming Events (Created)</h2>
+                <a href="{% url 'events:event_create' %}" class="text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline">Create new</a>
+            </div>
+            
+            {% if my_upcoming_events %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for event in my_upcoming_events %}
+                        <a href="{% url 'events:event_detail' event.slug %}" class="group block p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all">
+                            <h3 class="font-bold text-gray-900 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2">
+                                {{ event.title }}
+                            </h3>
+                            <div class="space-y-1 mb-3 sm:mb-4">
+                                <p class="text-xs text-gray-600 dark:text-gray-300 flex items-center">
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    {{ event.event_date|date:"M d, Y" }}
+                                </p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 flex items-center">
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span class="truncate">{{ event.location }}</span>
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between pt-2.5 sm:pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                <span class="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-200/50 dark:bg-zinc-700/50 px-2 py-1 rounded-md">{{ event.attendee_count }} going</span>
+                                <span class="text-xs text-primary-600 dark:text-primary-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Manage →</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12 bg-gray-50 dark:bg-zinc-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-700">
+                    <p class="text-gray-600 dark:text-gray-300 font-medium">You haven't planned any upcoming events.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Past Created Events (collapsible, spans 3 cols) -->
+        <div x-data="{ open: false }" class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] shadow-sm overflow-hidden">
+            <button type="button" @click="open = !open"
+                    class="w-full flex items-center justify-between p-5 sm:p-8 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Past Events (Created)</h2>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div x-show="open" x-collapse style="display:none" class="px-5 sm:px-8 pb-5 sm:pb-8">
+                {% if my_past_events %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for event in my_past_events %}
+                            <a href="{% url 'events:event_detail' event.slug %}" class="group block p-4 sm:p-5 rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all opacity-80 hover:opacity-100">
+                                <h3 class="font-bold text-gray-700 dark:text-gray-300 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2">{{ event.title }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    {{ event.event_date|date:"M d, Y" }}
+                                </p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 py-4">No past events created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Past RSVPs (collapsible, spans 3 cols) -->
+        <div x-data="{ open: false }" class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] shadow-sm overflow-hidden">
+            <button type="button" @click="open = !open"
+                    class="w-full flex items-center justify-between p-5 sm:p-8 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Events I Attended (Past)</h2>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div x-show="open" x-collapse style="display:none" class="px-5 sm:px-8 pb-5 sm:pb-8">
+                {% if past_rsvps %}
+                    <div class="space-y-3">
+                        {% for rsvp in past_rsvps %}
+                            <a href="{% url 'events:event_detail' rsvp.event.slug %}" class="flex items-center gap-3 p-3 sm:p-4 rounded-2xl border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group opacity-80 hover:opacity-100">
+                                <div class="bg-gray-100 dark:bg-zinc-800 rounded-lg w-12 h-12 flex flex-col items-center justify-center shrink-0">
+                                    <span class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase leading-none mb-1">{{ rsvp.event.event_date|date:"M" }}</span>
+                                    <span class="text-base font-extrabold text-gray-600 dark:text-gray-400 leading-none">{{ rsvp.event.event_date|date:"d" }}</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold text-gray-700 dark:text-gray-300 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{{ rsvp.event.title }}</h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{{ rsvp.event.location }}</p>
+                                </div>
+                                <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold
+                                    {% if rsvp.status == 'going' %}bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400
+                                    {% elif rsvp.status == 'maybe' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400
+                                    {% else %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400{% endif %}">
+                                    {{ rsvp.get_status_display }}
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500 dark:text-gray-400 py-4">No past events attended yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
