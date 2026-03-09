@@ -1,0 +1,238 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --color-primary-50: #ebf1f0;
+  --color-primary-100: #91b186;
+  --color-primary-400: #57aa97;
+  --color-primary-500: #5dba9e;
+  --color-primary-600: #3c7564;
+  --color-primary-700: #1b5d52;
+
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.5rem;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50 transition-colors duration-300;
+  }
+}
+
+.dark body {
+  @apply text-gray-100 bg-zinc-950;
+}
+
+/* Global enhancements for crispy tailwind inputs to support dark mode & match theme */
+@layer components {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  textarea,
+  select {
+    @apply transition-all focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent;
+  }
+
+  .dark label {
+    @apply text-gray-200;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-500;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    @apply text-gray-400;
+  }
+
+  input[type="file"]::file-selector-button {
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+  }
+
+  .dark input[type="file"]::file-selector-button {
+    @apply bg-zinc-700 text-gray-200 hover:bg-zinc-600;
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .bg-ada-fluid {
+    background-color: #ebf1f0;
+    background-image:
+      radial-gradient(42rem 28rem at 12% 86%, rgb(27 93 82 / 0.22), transparent 70%),
+      radial-gradient(34rem 28rem at 82% 10%, rgb(60 117 100 / 0.22), transparent 70%),
+      radial-gradient(38rem 30rem at 24% 22%, rgb(93 186 158 / 0.28), transparent 72%),
+      radial-gradient(40rem 32rem at 72% 66%, rgb(87 170 151 / 0.3), transparent 72%),
+      radial-gradient(50rem 34rem at 56% 46%, rgb(145 177 134 / 0.24), transparent 74%),
+      radial-gradient(45rem 35rem at 42% 62%, rgb(235 241 240 / 0.6), transparent 75%);
+  }
+
+  .dark .bg-ada-fluid {
+    background-color: #1b5d52;
+    background-image:
+      radial-gradient(42rem 28rem at 10% 88%, rgb(235 241 240 / 0.5), transparent 68%),
+      radial-gradient(34rem 28rem at 84% 10%, rgb(235 241 240 / 0.45), transparent 70%),
+      radial-gradient(38rem 30rem at 26% 22%, rgb(93 186 158 / 0.45), transparent 72%),
+      radial-gradient(40rem 32rem at 70% 68%, rgb(87 170 151 / 0.5), transparent 72%),
+      radial-gradient(50rem 34rem at 55% 45%, rgb(60 117 100 / 0.58), transparent 74%),
+      radial-gradient(45rem 35rem at 40% 60%, rgb(145 177 134 / 0.36), transparent 75%);
+  }
+
+  .bg-ada-grain {
+    background-image: radial-gradient(rgb(255 255 255 / 0.08) 0.6px, transparent 0.6px);
+    background-size: 3px 3px;
+  }
+
+  @keyframes ada-float-slow {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(2.5%, -2.5%, 0) scale(1.06);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes ada-float-reverse {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(-3%, 2%, 0) scale(1.08);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(2.5%, -3%, 0) scale(1.05);
+    }
+    66% {
+      transform: translate3d(-2%, 2%, 0) scale(0.98);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  .animate-ada-float-slow {
+    animation: ada-float-slow 18s ease-in-out infinite;
+  }
+
+  .animate-ada-float-reverse {
+    animation: ada-float-reverse 22s ease-in-out infinite;
+  }
+
+  .animate-blob {
+    animation: blob 16s ease-in-out infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  .dark input[type="text"],
+  .dark input[type="password"],
+  .dark input[type="email"],
+  .dark input[type="number"],
+  .dark textarea,
+  .dark select {
+    @apply bg-zinc-800 border-white/10 text-white placeholder-gray-400;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgb(255 255 255) !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgb(39 39 42) inset !important;
+    caret-color: rgb(255 255 255);
+  }
+
+  #id_password1_helptext,
+  #id_password2_helptext,
+  #id_new_password1_helptext,
+  #id_new_password2_helptext {
+    @apply mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300 list-disc pl-5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob,
+  .animate-ada-float-slow,
+  .animate-ada-float-reverse,
+  .animate-fade-in-up {
+    animation: none !important;
+  }
+}
+
+/* ─── Custom scrollbar ──────────────────────────────────────────────────────── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(60 117 100 / 0.45) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgb(87 170 151 / 0.45) transparent;
+}
+
+/* Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(60 117 100 / 0.4);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(60 117 100 / 0.75);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgb(87 170 151 / 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(87 170 151 / 0.75);
+}
