@@ -1,0 +1,53 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv pip install --system -r requirements/dev.txt
+
+      - name: Run tests
+        env:
+          DJANGO_SETTINGS_MODULE: ada_events.test_settings
+        run: pytest
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            cd /home/jmx/ada-events
+            git fetch origin main
+            git reset --hard origin/main
+            docker-compose up -d --build
+            docker-compose exec -T web python manage.py migrate --noinput
+            # seed_categories is idempotent — safe to run on every deploy
+            docker-compose exec -T web python manage.py seed_categories
