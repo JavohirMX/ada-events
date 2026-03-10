@@ -199,7 +199,7 @@ Expected output:
       Name                   Command               State          Ports
 -------------------------------------------------------------------------
 ada-events_db_1      docker-entrypoint.sh postgres    Up      5432/tcp
-ada-events_nginx_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:80->80/tcp
+ada-events_nginx_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8080->80/tcp, 0.0.0.0:8443->443/tcp
 ada-events_web_1     gunicorn --bind 0.0.0.0:8 ...   Up
 ```
 
@@ -444,9 +444,33 @@ Add to crontab:
 docker-compose logs web
 
 # Common issues:
-# - Port 80 in use: docker-compose down && docker-compose up -d
+# - Port 8080 in use: free port or change mapping, then restart
 # - Database not ready: wait a few seconds then retry
 ```
+
+### Port Already Allocated (8080)
+
+If you see:
+
+```text
+Bind for 127.0.0.1:8080 failed: port is already allocated
+```
+
+Run:
+
+```bash
+# 1) Find what is using 8080 on the host
+sudo ss -ltnp | grep :8080
+
+# 2) If it is an old Docker container from this project
+docker ps --format 'table {{.ID}}\t{{.Names}}\t{{.Ports}}' | grep 8080
+docker-compose down
+
+# 3) Start clean
+docker-compose up -d --build
+```
+
+If another app must keep `8080`, change the nginx port mapping in `docker-compose.yml` (for example `8081:80`) and then access the app on that new port.
 
 ### Database Connection Error
 
