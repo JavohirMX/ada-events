@@ -2000,8 +2000,8 @@
     --tw-gradient-position: to top right in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
-  .bg-\[linear-gradient\(110deg\,_\#1B5D52_0\%\,_\#3C7564_24\%\,_\#57AA97_48\%\,_\#5DBA9E_68\%\,_\#91B186_84\%\,_\#EBF1F0_100\%\)\] {
-    background-image: linear-gradient(110deg, #1B5D52 0%, #3C7564 24%, #57AA97 48%, #5DBA9E 68%, #91B186 84%, #EBF1F0 100%);
+  .bg-\[linear-gradient\(110deg\,_\#1B5D52_0\%\,_\#3C7564_24\%\,_\#57AA97_48\%\,_\#5DBA9E_100\%\)\] {
+    background-image: linear-gradient(110deg, #1B5D52 0%, #3C7564 24%, #57AA97 48%, #5DBA9E 100%);
   }
   .from-\[\#1B5D52\] {
     --tw-gradient-from: #1B5D52;
@@ -3582,6 +3582,11 @@
       margin-bottom: calc(var(--spacing) * 12);
     }
   }
+  .md\:block {
+    @media (width >= 48rem) {
+      display: block;
+    }
+  }
   .md\:flex {
     @media (width >= 48rem) {
       display: flex;
@@ -4162,9 +4167,9 @@
       }
     }
   }
-  .dark\:bg-\[linear-gradient\(110deg\,_\#5DBA9E_0\%\,_\#91B186_42\%\,_\#EBF1F0_100\%\)\] {
+  .dark\:bg-\[linear-gradient\(110deg\,_\#5DBA9E_0\%\,_\#EBF1F0_100\%\)\] {
     &:where(.dark, .dark *) {
-      background-image: linear-gradient(110deg, #5DBA9E 0%, #91B186 42%, #EBF1F0 100%);
+      background-image: linear-gradient(110deg, #5DBA9E 0%, #EBF1F0 100%);
     }
   }
   .dark\:from-\[\#1B5D52\] {
