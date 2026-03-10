@@ -299,6 +299,64 @@ docker-compose exec -T web python manage.py migrate
 docker-compose restart web
 ```
 
+### 4. Existing Host Nginx + Subdomains (Multi-Project Setup)
+
+If your server already has a host-level Nginx routing multiple projects by subdomain, keep this project on a dedicated internal port and route traffic from host Nginx.
+
+Current container mapping in this project:
+
+- HTTP: `127.0.0.1:8081 -> container:80`
+- HTTPS (container-level): `127.0.0.1:8444 -> container:443`
+
+Recommended in multi-project environments:
+
+1. Keep only the host Nginx handling SSL certificates and public `:80/:443`.
+2. Proxy each subdomain to a different localhost port.
+3. Do not publish this project on `0.0.0.0` unless needed.
+
+Example host Nginx config (`/etc/nginx/sites-available/events.adabali.com`):
+
+```nginx
+server {
+      listen 80;
+      server_name events.adabali.com;
+      return 301 https://$host$request_uri;
+}
+
+server {
+      listen 443 ssl http2;
+      server_name events.adabali.com;
+
+      ssl_certificate /etc/letsencrypt/live/events.adabali.com/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/events.adabali.com/privkey.pem;
+
+      location / {
+            proxy_pass http://127.0.0.1:8081;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+      }
+}
+```
+
+Enable and reload:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/events.adabali.com /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Set environment values accordingly:
+
+```bash
+ALLOWED_HOSTS=events.adabali.com
+CSRF_TRUSTED_ORIGINS=https://events.adabali.com
+```
+
+`SECURE_PROXY_SSL_HEADER` is already configured in Django settings.
+
 ---
 
 ## SSL/HTTPS
