@@ -47,6 +47,9 @@ jobs:
             cd /home/jmx/ada-events
             git fetch origin main
             git reset --hard origin/main
+            mkdir -p media/profiles media/events
+            chown -R 1001:1001 media
+            chmod -R u+rwX,go+rX media
             docker compose up -d --build
             docker compose exec -T web python manage.py migrate --noinput
             # seed_categories is idempotent — safe to run on every deploy

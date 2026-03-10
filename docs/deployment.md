@@ -179,6 +179,15 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 
 ### 4. Build and Start Containers
 
+Before starting containers, ensure the bind-mounted media directory is writable by
+the app container user (`appuser`, UID 1001 in `Dockerfile`):
+
+```bash
+mkdir -p media/profiles media/events
+chown -R 1001:1001 media
+chmod -R u+rwX,go+rX media
+```
+
 ```bash
 docker-compose up -d --build
 ```
@@ -272,6 +281,9 @@ git push origin main
 ```
 
 Check GitHub Actions tab to see progress. If successful, your site is live!
+
+The deploy workflow also reapplies media ownership on each deploy to avoid upload
+errors like `PermissionError: [Errno 13] Permission denied: '/app/media/profiles'`.
 
 ---
 
