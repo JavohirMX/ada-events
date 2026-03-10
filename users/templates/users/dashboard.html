@@ -8,11 +8,10 @@
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Dashboard</h1>
     </div>
     
-    <!-- Bento Grid Layout -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         
         <!-- Top Profile Card (Spans 2 cols) -->
-        <div class="md:col-span-2 bg-gradient-to-br from-[#1B5D52] via-[#3C7564] to-[#57AA97] max-h-fit rounded-2xl sm:rounded-[32px] p-5 sm:p-7 text-white relative overflow-hidden shadow-sm">
+        <div class="md:col-span-2 bg-teal-800/40 dark:bg-teal-900/50 backdrop-blur-xl border border-teal-500/30 dark:border-teal-400/20 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] max-h-fit rounded-2xl sm:rounded-[32px] p-5 sm:p-7 text-white relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-[#EBF1F0]/25 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -50,7 +49,7 @@
         </div>
 
         <!-- Quick Stats Bento -->
-        <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm flex flex-col justify-center">
+        <div class="bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl sm:rounded-[32px] p-5 sm:p-8 flex flex-col justify-center">
             <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Activity</h2>
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-gray-50 dark:bg-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center transition-transform hover:-translate-y-1">
@@ -67,7 +66,7 @@
         
 
         <!-- Attending Events Bento (Spans 2 cols) -->
-        <div class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
+        <div class="md:col-span-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl sm:rounded-[32px] p-5 sm:p-8">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Events I'm Attending</h2>
             </div>
@@ -107,7 +106,7 @@
         </div>
         
         <!-- My Created Events Bento (Spans 3 cols on desktop) -->
-        <div class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
+        <div class="md:col-span-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl sm:rounded-[32px] p-5 sm:p-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-6 gap-2 sm:gap-3">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">My Upcoming Events (Created)</h2>
                 <a href="{% url 'events:event_create' %}" class="text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline">Create new</a>
@@ -145,7 +144,7 @@
         </div>
 
         <!-- Past Created Events (collapsible, spans 3 cols) -->
-        <div x-data="{ open: false }" class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] shadow-sm overflow-hidden">
+        <div x-data="{ open: false }" class="md:col-span-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl sm:rounded-[32px] overflow-hidden">
             <button type="button" @click="open = !open"
                     class="w-full flex items-center justify-between p-5 sm:p-8 text-left">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Past Events (Created)</h2>
@@ -173,7 +172,7 @@
         </div>
 
         <!-- Past RSVPs (collapsible, spans 3 cols) -->
-        <div x-data="{ open: false }" class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] shadow-sm overflow-hidden">
+        <div x-data="{ open: false }" class="md:col-span-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-2xl sm:rounded-[32px] overflow-hidden">
             <button type="button" @click="open = !open"
                     class="w-full flex items-center justify-between p-5 sm:p-8 text-left">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Events I Attended (Past)</h2>

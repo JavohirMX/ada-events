@@ -12,7 +12,7 @@ services:
     # immediately — no image rebuild needed.
     volumes:
       - .:/app
-      - /app/staticfiles   # keep the collectstatic output from the image build
+      - static_volume:/app/staticfiles   # share collectstatic output with nginx
     environment:
       - DEBUG=True
     command:
@@ -40,4 +40,5 @@ services:
     restart: unless-stopped
 
 volumes:
+  static_volume:
   tailwind_node_modules:
