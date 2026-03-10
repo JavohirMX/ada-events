@@ -3,6 +3,7 @@ from django.urls import reverse
 from datetime import timedelta
 from django.utils import timezone
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
 
 
 @pytest.mark.django_db
@@ -56,6 +57,13 @@ class TestAuthMobileTemplates:
         response = client.get(reverse("account_signup"))
         assert response.status_code == 200
         assert 'data-mobile-auth-form="true"' in response.content.decode()
+
+
+@pytest.mark.django_db
+class TestSocialAuthConfiguration:
+    def test_google_social_login_auto_links_existing_email_accounts(self):
+        assert settings.SOCIALACCOUNT_EMAIL_AUTHENTICATION is True
+        assert settings.SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT is True
 
 
 @pytest.mark.django_db

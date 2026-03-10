@@ -90,6 +90,7 @@ For developers modifying the code, here is an explanation of how the implementat
 
 - **`INSTALLED_APPS`**: Includes `allauth.socialaccount.providers.google` which tells `django-allauth` to load the Google provider.
 - **`SOCIALACCOUNT_PROVIDERS`**: Configured to read directly from the `.env` variables mapped above. This approach bypasses the need for the `SocialApp` database table.
+- **`SOCIALACCOUNT_EMAIL_AUTHENTICATION = True`**: Allows allauth to authenticate users by verified social email so existing users are signed in directly instead of being sent to the intermediate third-party signup page.
 - **`SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True`**: Automatically maps a Google sign-in to an existing account if the emails match.
 - **Redirects**: `LOGIN_REDIRECT_URL = "home"` ensures users land on the events dashboard once authed.
 
