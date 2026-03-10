@@ -47,7 +47,7 @@ jobs:
             cd /home/jmx/ada-events
             git fetch origin main
             git reset --hard origin/main
-            docker-compose up -d --build
-            docker-compose exec -T web python manage.py migrate --noinput
+            docker compose up -d --build
+            docker compose exec -T web python manage.py migrate --noinput
             # seed_categories is idempotent — safe to run on every deploy
-            docker-compose exec -T web python manage.py seed_categories
+            docker compose exec -T web python manage.py seed_categories
