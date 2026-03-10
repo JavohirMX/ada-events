@@ -48,7 +48,7 @@
             <div class="hidden sm:block w-full sm:w-auto" data-mobile-filter-category="true">
                 <label for="category-filter" class="sr-only">Category</label>
                 <select id="category-filter"
-                        @change="selectedCategory = $event.target.value"
+                        @change="selectedCategory = $event.target.value; $nextTick(() => $el.closest('form').submit())"
                         class="w-full sm:w-auto bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl sm:rounded-full focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-medium text-gray-700 dark:text-gray-300 py-2.5 min-h-11 pl-3 pr-8 cursor-pointer appearance-none">
                     <option value="" class="dark:bg-zinc-800">All Categories</option>
                     {% for cat in categories %}
@@ -63,11 +63,13 @@
                 <div class="hidden sm:flex items-center gap-1">
                     <label for="date-from" class="sr-only">From date</label>
                     <input id="date-from" type="date" name="date_from" value="{{ date_from }}"
+                           @change="$el.closest('form').submit()"
                            class="py-2 px-3 min-h-11 bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
                            aria-label="From date">
                     <span class="text-gray-400 dark:text-gray-500 text-xs font-medium px-1">–</span>
                     <label for="date-to" class="sr-only">To date</label>
                     <input id="date-to" type="date" name="date_to" value="{{ date_to }}"
+                           @change="$el.closest('form').submit()"
                            class="py-2 px-3 min-h-11 bg-gray-50 dark:bg-zinc-800 border border-gray-200/80 dark:border-zinc-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none"
                            aria-label="To date">
                 </div>
@@ -198,10 +200,8 @@
     </div>
 
     {% if events %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {% for event in events %}
-                {% include 'events/partials/event_card.html' with event=event variant='upcoming' show_rsvp=True today=today tomorrow=tomorrow %}
-            {% endfor %}
+        <div id="event-list-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% include 'events/partials/event_cards_chunk.html' %}
         </div>
     {% else %}
         <div class="text-center py-24 bg-white dark:bg-zinc-900 rounded-[32px] border border-gray-100 dark:border-zinc-800 shadow-sm mt-8">

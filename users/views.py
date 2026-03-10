@@ -89,3 +89,17 @@ def notification_mark_read(request, pk):
 def notifications_mark_all_read(request):
     request.user.notifications.filter(is_read=False).update(is_read=True)
     return redirect("users:notifications_inbox")
+
+
+@login_required
+def notification_open(request, pk):
+    """Mark a notification as read and redirect to its link."""
+    notification = get_object_or_404(Notification, pk=pk)
+    if notification.user != request.user:
+        return HttpResponseForbidden(b"Not allowed")
+    if not notification.is_read:
+        notification.is_read = True
+        notification.save(update_fields=["is_read"])
+    if notification.link:
+        return redirect(notification.link)
+    return redirect("users:notifications_inbox")

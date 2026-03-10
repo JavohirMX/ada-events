@@ -64,27 +64,10 @@
             </div>
         </div>
 
-        <!-- Notifications Bento -->
-        <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm flex flex-col">
-            <div class="flex items-center justify-between mb-4 sm:mb-6 gap-2">
-                <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Notifications</h2>
-                {% if notifications_unread_count %}
-                    <span class="bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold px-2.5 py-0.5 rounded-full">{{ notifications_unread_count }} new</span>
-                {% endif %}
-            </div>
-            
-            <div class="flex-1 flex flex-col items-center justify-center text-center">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-                    <svg class="w-7 h-7 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                </div>
-                <a href="{% url 'users:notifications_inbox' %}" class="inline-flex items-center justify-center w-full py-2.5 sm:py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-white rounded-xl font-semibold text-sm transition-colors mt-auto">
-                    View Inbox →
-                </a>
-            </div>
-        </div>
+        
 
         <!-- Attending Events Bento (Spans 2 cols) -->
-        <div class="md:col-span-2 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
+        <div class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Events I'm Attending</h2>
             </div>
@@ -164,7 +147,7 @@
         <!-- Past Created Events (collapsible, spans 3 cols) -->
         <div x-data="{ open: false }" class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] shadow-sm overflow-hidden">
             <button type="button" @click="open = !open"
-                    class="w-full flex items-center justify-between p-5 sm:p-8 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    class="w-full flex items-center justify-between p-5 sm:p-8 text-left">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Past Events (Created)</h2>
                 <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -192,7 +175,7 @@
         <!-- Past RSVPs (collapsible, spans 3 cols) -->
         <div x-data="{ open: false }" class="md:col-span-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl sm:rounded-[32px] shadow-sm overflow-hidden">
             <button type="button" @click="open = !open"
-                    class="w-full flex items-center justify-between p-5 sm:p-8 text-left hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                    class="w-full flex items-center justify-between p-5 sm:p-8 text-left">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Events I Attended (Past)</h2>
                 <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>

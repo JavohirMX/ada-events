@@ -173,13 +173,12 @@
 </div>
 
 <script>
-    // Wire up the hidden file input to Alpine's handlePhoto
-    document.addEventListener('alpine:init', function() {});
     document.addEventListener('DOMContentLoaded', function () {
         var fileInput = document.getElementById('id_profile_photo');
         if (!fileInput) return;
         fileInput.addEventListener('change', function (e) {
-            var root = document.querySelector('[x-data]');
+            // Use closest('[x-data]') to find the profile-edit scope, not the global html x-data
+            var root = fileInput.closest('[x-data]');
             if (!root) return;
             var data = Alpine.$data(root);
             if (data && typeof data.handlePhoto === 'function') data.handlePhoto(e);

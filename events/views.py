@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime as _dt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -5,7 +6,9 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Q
+from django.core.paginator import Paginator
 from django.core.files.storage import default_storage
+from django.urls import reverse
 from events.models import Event, EventCategory, RSVP, EventAttachment
 from django.views.decorators.http import require_http_methods
 
@@ -81,22 +84,38 @@ def event_list(request):
         except ValueError:
             pass
 
-    events = events.order_by("event_date", "event_time")
+    events = events.order_by("event_date", "event_time", "id")
+
+    paginator = Paginator(events, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    query_params = request.GET.copy()
+    query_params.pop("page", None)
+    next_page_url = None
+    if page_obj.has_next():
+        next_params = query_params.copy()
+        next_params["page"] = page_obj.next_page_number()
+        next_page_url = f"{reverse('events:event_list')}?{next_params.urlencode()}"
+
     categories = EventCategory.objects.all()
-    return render(
-        request,
-        "events/event_list.html",
-        {
-            "events": events,
-            "categories": categories,
-            "selected_category": category,
-            "search_query": query,
-            "date_from": date_from_raw,
-            "date_to": date_to_raw,
-            "today": today,
-            "tomorrow": tomorrow,
-        },
-    )
+    context = {
+        "events": page_obj.object_list,
+        "page_obj": page_obj,
+        "next_page_url": next_page_url,
+        "categories": categories,
+        "selected_category": category,
+        "search_query": query,
+        "date_from": date_from_raw,
+        "date_to": date_to_raw,
+        "today": today,
+        "tomorrow": tomorrow,
+    }
+
+    if request.headers.get("HX-Request") == "true":
+        return render(request, "events/partials/event_cards_chunk.html", context)
+
+    return render(request, "events/event_list.html", context)
 
 
 @login_required
@@ -166,7 +185,21 @@ def event_detail(request, slug):
     if request.user.is_authenticated:
         user_rsvp = RSVP.objects.filter(event=event, user=request.user).first()
 
-    attendees = event.rsvps.filter(status="going") if event.is_public_attendees else []
+    if event.is_public_attendees:
+        attendees = event.rsvps.filter(status="going").select_related("user")
+        maybe_rsvps = event.rsvps.filter(status="maybe").select_related("user")
+    else:
+        attendees = []
+        maybe_rsvps = []
+
+    # Google Calendar end time (start + 1 hour for timed events, next day for all-day)
+    if event.event_time:
+        start_dt = _dt.combine(event.event_date, event.event_time)
+        gcal_end_time = (start_dt + timedelta(hours=1)).time()
+        gcal_end_date = event.event_date
+    else:
+        gcal_end_time = None
+        gcal_end_date = event.event_date + timedelta(days=1)
 
     return render(
         request,
@@ -175,6 +208,9 @@ def event_detail(request, slug):
             "event": event,
             "user_rsvp": user_rsvp,
             "attendees": attendees,
+            "maybe_rsvps": maybe_rsvps,
+            "gcal_end_time": gcal_end_time,
+            "gcal_end_date": gcal_end_date,
         },
     )
 

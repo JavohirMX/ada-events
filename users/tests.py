@@ -102,6 +102,39 @@ class TestNotificationsViews:
         assert response.status_code == 200
         assert "New event" in response.content.decode()
 
+    def test_notifications_inbox_cards_are_clickable_glass(self, client, user):
+        from events.models import Notification
+
+        Notification.objects.create(
+            user=user,
+            notification_type="event_created",
+            message="Tap me",
+            link=reverse("home"),
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("users:notifications_inbox"))
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert 'data-notification-card="true"' in content
+        assert 'data-notification-card-link="true"' in content
+        assert 'data-notification-card-glass="true"' in content
+
+    def test_notifications_inbox_has_no_emerald_dark_text_classes(self, client, user):
+        from events.models import Notification
+
+        Notification.objects.create(
+            user=user,
+            notification_type="event_created",
+            message="No emerald dark text",
+            link=reverse("home"),
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("users:notifications_inbox"))
+        assert response.status_code == 200
+        assert "dark:text-emerald-" not in response.content.decode()
+
     def test_mark_notification_read(self, client, user):
         from events.models import Notification
 

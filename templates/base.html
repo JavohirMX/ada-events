@@ -120,7 +120,7 @@
                     x-transition:leave-end="opacity-0 sm:translate-x-4"
                     class="pointer-events-auto relative overflow-hidden rounded-2xl border shadow-sm backdrop-blur-sm p-4"
                     :class="{
-                        'bg-emerald-50/95 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50': toast.variant === 'success',
+                        'bg-emerald-50/95 dark:bg-emerald-950/40 text-emerald-800 dark:text-primary-100 border-emerald-200 dark:border-emerald-900/50': toast.variant === 'success',
                         'bg-amber-50/95 dark:bg-amber-950/35 text-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-900/50': toast.variant === 'warning',
                         'bg-red-50/95 dark:bg-red-950/35 text-red-800 dark:text-red-300 border-red-200 dark:border-red-900/50': toast.variant === 'error',
                         'bg-blue-50/95 dark:bg-blue-950/35 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-900/50': toast.variant === 'info'
@@ -161,39 +161,48 @@
         </div>
     </div>
 
-    <main class="flex-1 w-full pt-24 md:pt-28 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-12">
+    <main class="flex-1 w-full pt-24 md:pt-28 pb-[calc(4.85rem+env(safe-area-inset-bottom))] md:pb-12">
         {% block content %}{% endblock %}
     </main>
 
-    <nav aria-label="Mobile primary" data-mobile-bottom-nav="true" class="md:hidden fixed bottom-0 inset-x-0 z-50 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <div class="mx-auto w-full max-w-md rounded-3xl border border-gray-200/70 dark:border-white/10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_10px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_10px_30px_rgb(0,0,0,0.35)] px-3 py-2">
-            <div class="grid grid-cols-3 gap-1 text-xs font-semibold">
-                <a href="{% url 'home' %}" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-2 transition-colors {% if request.resolver_match.url_name == 'home' %}bg-black text-white dark:bg-white dark:text-black{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10{% endif %}">
-                    <span>Home</span>
+    <nav aria-label="Mobile primary" data-mobile-bottom-nav="true" data-mobile-bottom-nav-compact="true" data-mobile-bottom-nav-horizontal="true" class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border-t border-gray-200/60 dark:border-white/10 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_-4px_24px_rgba(0,0,0,0.2)]">
+        <div class="flex items-center justify-around w-full px-2 py-2">
+            <a href="{% url 'home' %}" class="group flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-medium tracking-tight transition-colors duration-200 {% if request.resolver_match.url_name == 'home' %}text-gray-900 dark:text-white font-semibold{% else %}text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white{% endif %}">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span class="leading-none">Home</span>
+            </a>
+            <a href="{% url 'events:event_list' %}" class="group flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-medium tracking-tight transition-colors duration-200 {% if request.resolver_match.namespace == 'events' and request.resolver_match.url_name != 'event_create' %}text-gray-900 dark:text-white font-semibold{% else %}text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white{% endif %}">
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span class="leading-none">Events</span>
+            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'events:event_create' %}" class="group flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-medium tracking-tight transition-colors duration-200 {% if request.resolver_match.url_name == 'event_create' %}text-gray-900 dark:text-white font-semibold{% else %}text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white{% endif %}">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    <span class="leading-none">Create</span>
                 </a>
-                <a href="{% url 'events:event_list' %}" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-2 transition-colors {% if request.resolver_match.namespace == 'events' %}bg-black text-white dark:bg-white dark:text-black{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10{% endif %}">
-                    <span>Events</span>
+                <a href="{% url 'users:dashboard' %}" class="group flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-medium tracking-tight transition-colors duration-200 {% if request.resolver_match.namespace == 'users' %}text-gray-900 dark:text-white font-semibold{% else %}text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white{% endif %}">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span class="leading-none">Profile</span>
                 </a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'users:dashboard' %}" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-2 transition-colors {% if request.resolver_match.namespace == 'users' %}bg-black text-white dark:bg-white dark:text-black{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10{% endif %}">
-                        <span>Profile</span>
-                    </a>
-                {% else %}
-                    <a href="{% url 'account_login' %}" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-2 transition-colors {% if '/accounts/' in request.path %}bg-black text-white dark:bg-white dark:text-black{% else %}text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10{% endif %}">
-                        <span>Profile</span>
-                    </a>
-                {% endif %}
-            </div>
+            {% else %}
+                <a href="{% url 'account_login' %}" class="group flex-1 flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-medium tracking-tight transition-colors duration-200 {% if '/accounts/' in request.path %}text-gray-900 dark:text-white font-semibold{% else %}text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white{% endif %}">
+                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span class="leading-none">Sign in</span>
+                </a>
+            {% endif %}
         </div>
     </nav>
 
-    <footer class="mt-auto border-t border-gray-200 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-md">
+    <footer class="mt-auto border-t border-gray-200 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-md pb-24 md:pb-0">
         <div class="max-w-7xl mx-auto py-8 px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2 grayscale opacity-60">
                 <span class="text-sm font-semibold text-gray-900 dark:text-white tracking-tight">ADA Events</span>
             </div>
             <p class="text-gray-500 dark:text-gray-300 text-sm">
                 &copy; 2026 Apple Developer Academy @ Binus.
+            </p>
+            <p class="text-gray-500 dark:text-gray-300 text-sm">
+                Developed by <a href="https://javohirmx.com" target="_blank" rel="noopener noreferrer" class="font-medium hover:text-gray-900 dark:hover:text-white transition-colors underline underline-offset-2">JavohirMX</a>
             </p>
         </div>
     </footer>
@@ -308,6 +317,11 @@
         }
     </script>
     {% block extra_js %}{% endblock %}
-    <script>lucide.createIcons();</script>
+    <script>
+        lucide.createIcons();
+        document.body.addEventListener('htmx:afterSwap', function () {
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>

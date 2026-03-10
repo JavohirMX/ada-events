@@ -19,7 +19,7 @@
         <div class="flex-1 min-w-0">
             <div class="mb-8">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="text-sm font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400">
+                    <div class="text-sm font-semibold uppercase tracking-wider text-emerald-700 dark:text-white">
                         {{ event.event_date|date:"l, F j" }}
                     </div>
                     {% if event.category %}
@@ -79,27 +79,67 @@
 
             <!-- Attendees (desktop only — mobile version rendered below the two-col grid) -->
             {% if event.is_public_attendees %}
-                <div class="hidden lg:block mt-8 border-t border-gray-100 dark:border-white/10 pt-8">
-                    <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-                        Attendees <span class="bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-sm px-2.5 py-0.5 rounded-full">{{ event.attendee_count }}</span>
+                <div class="hidden lg:block mt-8 border-t border-gray-100 dark:border-white/10 pt-8"
+                     x-data="{ goingExpanded: false, maybeExpanded: false }">
+                    <!-- Going -->
+                    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+                        Going <span class="bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-sm px-2.5 py-0.5 rounded-full">{{ event.attendee_count }}</span>
                     </h2>
-                    
                     {% if attendees %}
-                        <div class="flex flex-wrap gap-3">
+                        <div class="space-y-0.5 mb-3">
                             {% for rsvp in attendees %}
-                                <a href="{% url 'users:profile' rsvp.user.username %}" class="group relative" title="{{ rsvp.user.username }}">
+                                <a href="{% url 'users:profile' rsvp.user.username %}" class="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-2 py-1.5 transition-colors"
+                                   {% if forloop.counter > 5 %}x-show="goingExpanded" x-transition:enter="transition-opacity duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"{% endif %}>
                                     {% if rsvp.user.profile_photo %}
-                                        <img src="{{ rsvp.user.profile_photo.url }}" alt="{{ rsvp.user.username }}" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-zinc-900 shadow-sm group-hover:-translate-y-1 transition-transform">
+                                        <img src="{{ rsvp.user.profile_photo.url }}" alt="{{ rsvp.user.username }}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-zinc-700 flex-shrink-0">
                                     {% else %}
-                                        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#1B5D52] via-[#57AA97] to-[#EBF1F0] dark:from-[#1B5D52] dark:via-[#3C7564] dark:to-[#5DBA9E] flex items-center justify-center border-2 border-white dark:border-zinc-900 shadow-sm group-hover:-translate-y-1 transition-transform">
-                                            <span class="text-primary-700 dark:text-primary-300 font-bold uppercase">{{ rsvp.user.username|slice:":2" }}</span>
+                                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1B5D52] via-[#57AA97] to-[#EBF1F0] flex items-center justify-center border border-gray-200 dark:border-zinc-700 flex-shrink-0">
+                                            <span class="text-white text-xs font-bold uppercase">{{ rsvp.user.username|slice:":1" }}</span>
                                         </div>
                                     {% endif %}
+                                    <span class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{{ rsvp.user.get_full_name|default:rsvp.user.username }}</span>
                                 </a>
                             {% endfor %}
                         </div>
+                        {% if attendees|length > 5 %}
+                                <button @click="goingExpanded = !goingExpanded"
+                                    class="text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white px-2 py-1 mb-5 transition-colors flex items-center gap-1">
+                                <span x-show="!goingExpanded">See all {{ attendees|length }} <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
+                                <span x-show="goingExpanded" style="display:none">Show less <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></span>
+                            </button>
+                        {% else %}
+                            <div class="mb-5"></div>
+                        {% endif %}
                     {% else %}
-                        <p class="text-gray-500 dark:text-gray-300 italic">No one has RSVP'd yet. Be the first!</p>
+                        <p class="text-gray-500 dark:text-gray-400 italic text-sm mb-5">No one has RSVP'd yet. Be the first!</p>
+                    {% endif %}
+                    <!-- Maybe -->
+                    {% if maybe_rsvps %}
+                        <h3 class="text-base font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
+                            Maybe <span class="bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-sm px-2.5 py-0.5 rounded-full">{{ maybe_rsvps|length }}</span>
+                        </h3>
+                        <div class="space-y-0.5">
+                            {% for rsvp in maybe_rsvps %}
+                                <a href="{% url 'users:profile' rsvp.user.username %}" class="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-2 py-1.5 transition-colors"
+                                   {% if forloop.counter > 5 %}x-show="maybeExpanded" x-transition:enter="transition-opacity duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"{% endif %}>
+                                    {% if rsvp.user.profile_photo %}
+                                        <img src="{{ rsvp.user.profile_photo.url }}" alt="{{ rsvp.user.username }}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-zinc-700 flex-shrink-0">
+                                    {% else %}
+                                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#57AA97] to-[#91B186] flex items-center justify-center border border-gray-200 dark:border-zinc-700 flex-shrink-0">
+                                            <span class="text-white text-xs font-bold uppercase">{{ rsvp.user.username|slice:":1" }}</span>
+                                        </div>
+                                    {% endif %}
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">{{ rsvp.user.get_full_name|default:rsvp.user.username }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        {% if maybe_rsvps|length > 5 %}
+                                <button @click="maybeExpanded = !maybeExpanded"
+                                    class="text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white px-2 py-1 mt-2 transition-colors flex items-center gap-1">
+                                <span x-show="!maybeExpanded">See all {{ maybe_rsvps|length }} <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
+                                <span x-show="maybeExpanded" style="display:none">Show less <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></span>
+                            </button>
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endif %}
@@ -120,9 +160,20 @@
                         {% if event.event_time %}
                             <p class="text-base text-gray-600 dark:text-gray-300">{{ event.event_time|time:"g:i A" }}</p>
                         {% endif %}
-                        <div class="flex gap-2 mt-2">
-                            <a href="{% url 'events:event_ics' event.slug %}" class="text-xs font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 bg-primary-50 dark:bg-primary-900/30 px-2 py-1 rounded-md transition-colors">ICS</a>
-                            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ event.title|urlencode }}&dates={{ event.event_date|date:'Ymd'|upper }}{% if event.event_time %}{{ event.event_time|time:'Hi'|upper }}{% else %}0000{% endif %}/{% if event.event_time %}{{ event.event_time|time:'Hi'|upper }}{% else %}2359{% endif %}&location={{ event.location|urlencode }}" target="_blank" class="text-xs font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 bg-primary-50 dark:bg-primary-900/30 px-2 py-1 rounded-md transition-colors">Google</a>
+                        <div data-add-calendar-menu="true" x-data="{ open: false }" @keydown.escape.window="open = false" class="relative mt-2">
+                            <button type="button" @click="open = !open" class="inline-flex items-center gap-2 text-xs font-semibold text-primary-700 dark:text-primary-200 hover:text-primary-800 dark:hover:text-primary-100 bg-primary-50 dark:bg-primary-900/30 px-3 py-1.5 rounded-lg transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                Add to Calendar
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div x-show="open" x-transition.opacity.duration.150ms @click.away="open = false" style="display:none" class="absolute left-0 top-full mt-2 w-44 rounded-xl border border-gray-200/70 dark:border-zinc-700/70 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl shadow-lg overflow-hidden z-20">
+                                <a href="{% url 'events:event_ics' event.slug %}" class="flex items-center gap-2 px-3 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">Download ICS</a>
+                                {% if event.event_time %}
+                                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ event.title|urlencode }}&dates={{ event.event_date|date:'Ymd' }}T{{ event.event_time|time:'His' }}/{{ event.event_date|date:'Ymd' }}T{{ gcal_end_time|time:'His' }}&location={{ event.location|urlencode }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">Google Calendar</a>
+                                {% else %}
+                                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ event.title|urlencode }}&dates={{ event.event_date|date:'Ymd' }}/{{ gcal_end_date|date:'Ymd' }}&location={{ event.location|urlencode }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-3 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">Google Calendar</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,27 +237,67 @@
 
     <!-- Attendees (mobile only — shown below the RSVP card) -->
     {% if event.is_public_attendees %}
-        <div class="lg:hidden mt-8 border-t border-gray-100 dark:border-white/10 pt-8">
-            <h2 class="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2">
-                Attendees <span class="bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-sm px-2.5 py-0.5 rounded-full">{{ event.attendee_count }}</span>
+        <div class="lg:hidden mt-8 border-t border-gray-100 dark:border-white/10 pt-8"
+             x-data="{ goingExpanded: false, maybeExpanded: false }">
+            <!-- Going -->
+            <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+                Going <span class="bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-sm px-2.5 py-0.5 rounded-full">{{ event.attendee_count }}</span>
             </h2>
-            
             {% if attendees %}
-                <div class="flex flex-wrap gap-3">
+                <div class="space-y-0.5 mb-3">
                     {% for rsvp in attendees %}
-                        <a href="{% url 'users:profile' rsvp.user.username %}" class="group relative" title="{{ rsvp.user.username }}">
+                        <a href="{% url 'users:profile' rsvp.user.username %}" class="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-2 py-1.5 transition-colors"
+                           {% if forloop.counter > 5 %}x-show="goingExpanded" x-transition:enter="transition-opacity duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"{% endif %}>
                             {% if rsvp.user.profile_photo %}
-                                <img src="{{ rsvp.user.profile_photo.url }}" alt="{{ rsvp.user.username }}" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-zinc-900 shadow-sm group-hover:-translate-y-1 transition-transform">
+                                <img src="{{ rsvp.user.profile_photo.url }}" alt="{{ rsvp.user.username }}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-zinc-700 flex-shrink-0">
                             {% else %}
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#1B5D52] via-[#57AA97] to-[#EBF1F0] dark:from-[#1B5D52] dark:via-[#3C7564] dark:to-[#5DBA9E] flex items-center justify-center border-2 border-white dark:border-zinc-900 shadow-sm group-hover:-translate-y-1 transition-transform">
-                                    <span class="text-primary-700 dark:text-primary-300 font-bold uppercase">{{ rsvp.user.username|slice:":2" }}</span>
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1B5D52] via-[#57AA97] to-[#EBF1F0] flex items-center justify-center border border-gray-200 dark:border-zinc-700 flex-shrink-0">
+                                    <span class="text-white text-xs font-bold uppercase">{{ rsvp.user.username|slice:":1" }}</span>
                                 </div>
                             {% endif %}
+                            <span class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{{ rsvp.user.get_full_name|default:rsvp.user.username }}</span>
                         </a>
                     {% endfor %}
                 </div>
+                {% if attendees|length > 5 %}
+                        <button @click="goingExpanded = !goingExpanded"
+                            class="text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white px-2 py-1 mb-5 transition-colors flex items-center gap-1">
+                        <span x-show="!goingExpanded">See all {{ attendees|length }} <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
+                        <span x-show="goingExpanded" style="display:none">Show less <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></span>
+                    </button>
+                {% else %}
+                    <div class="mb-5"></div>
+                {% endif %}
             {% else %}
-                <p class="text-gray-500 dark:text-gray-300 italic">No one has RSVP'd yet. Be the first!</p>
+                <p class="text-gray-500 dark:text-gray-400 italic text-sm mb-5">No one has RSVP'd yet. Be the first!</p>
+            {% endif %}
+            <!-- Maybe -->
+            {% if maybe_rsvps %}
+                <h3 class="text-base font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
+                    Maybe <span class="bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-sm px-2.5 py-0.5 rounded-full">{{ maybe_rsvps|length }}</span>
+                </h3>
+                <div class="space-y-0.5">
+                    {% for rsvp in maybe_rsvps %}
+                        <a href="{% url 'users:profile' rsvp.user.username %}" class="flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-2 py-1.5 transition-colors"
+                           {% if forloop.counter > 5 %}x-show="maybeExpanded" x-transition:enter="transition-opacity duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"{% endif %}>
+                            {% if rsvp.user.profile_photo %}
+                                <img src="{{ rsvp.user.profile_photo.url }}" alt="{{ rsvp.user.username }}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-zinc-700 flex-shrink-0">
+                            {% else %}
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#57AA97] to-[#91B186] flex items-center justify-center border border-gray-200 dark:border-zinc-700 flex-shrink-0">
+                                    <span class="text-white text-xs font-bold uppercase">{{ rsvp.user.username|slice:":1" }}</span>
+                                </div>
+                            {% endif %}
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">{{ rsvp.user.get_full_name|default:rsvp.user.username }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+                {% if maybe_rsvps|length > 5 %}
+                        <button @click="maybeExpanded = !maybeExpanded"
+                            class="text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white px-2 py-1 mt-2 transition-colors flex items-center gap-1">
+                        <span x-show="!maybeExpanded">See all {{ maybe_rsvps|length }} <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
+                        <span x-show="maybeExpanded" style="display:none">Show less <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></span>
+                    </button>
+                {% endif %}
             {% endif %}
         </div>
     {% endif %}

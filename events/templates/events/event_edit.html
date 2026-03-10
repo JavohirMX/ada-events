@@ -102,7 +102,7 @@
         {% endif %}
 
         <!-- Danger Zone: Delete Event -->
-        <div class="mt-10 pt-8 border-t border-red-200 dark:border-red-900/40">
+        <div class="mt-10 pt-8">
             <h3 class="text-base font-bold text-red-600 dark:text-red-400 mb-2">Danger Zone</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Deleting this event will remove it from all listings. This action cannot be undone.</p>
             <form method="post" action="{% url 'events:event_delete' event.slug %}" onsubmit="return confirm('Are you sure? This will permanently delete the event.')">

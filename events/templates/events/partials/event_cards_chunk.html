@@ -1,0 +1,4 @@
+{% for event in events %}
+    {% include 'events/partials/event_card.html' with event=event variant='upcoming' show_rsvp=True today=today tomorrow=tomorrow %}
+{% endfor %}
+{% include 'events/partials/event_list_load_more.html' %}

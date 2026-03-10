@@ -467,6 +467,8 @@ class TestEventDiscoveryAndValidation:
         assert response.status_code == 200
         content = response.content.decode()
         assert 'data-mobile-bottom-nav="true"' in content
+        assert 'data-mobile-bottom-nav-compact="true"' in content
+        assert 'data-mobile-bottom-nav-horizontal="true"' in content
 
     def test_search_query_filters_events(self, client, user, category):
         Event.objects.create(
@@ -491,6 +493,81 @@ class TestEventDiscoveryAndValidation:
         content = response.content.decode()
         assert "Beach Run" in content
         assert "Football Night" not in content
+
+    def test_event_list_shows_first_20_events_and_load_more_trigger(
+        self, client, user, category
+    ):
+        for idx in range(25):
+            Event.objects.create(
+                creator=user,
+                title=f"Session {idx}",
+                description="Desc",
+                category=category,
+                event_date=timezone.now().date() + timedelta(days=1),
+                location="Kuta",
+            )
+
+        response = client.get(reverse("events:event_list"))
+        assert response.status_code == 200
+        content = response.content.decode()
+
+        assert content.count('data-event-card="true"') == 20
+        assert 'data-events-load-more="true"' in content
+        assert "page=2" in content
+
+    def test_event_list_htmx_next_page_returns_only_remaining_cards(
+        self, client, user, category
+    ):
+        for idx in range(25):
+            Event.objects.create(
+                creator=user,
+                title=f"Paged Session {idx}",
+                description="Desc",
+                category=category,
+                event_date=timezone.now().date() + timedelta(days=1),
+                location="Canggu",
+            )
+
+        response = client.get(
+            reverse("events:event_list") + "?page=2",
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+
+        assert content.count('data-event-card="true"') == 5
+        assert 'data-mobile-discovery-filters="true"' not in content
+        assert 'data-events-load-more="true"' not in content
+
+    def test_event_list_load_more_keeps_active_filters(self, client, user, category):
+        EventCategory.objects.create(name="Music", icon="music", color="#123456")
+        for idx in range(25):
+            Event.objects.create(
+                creator=user,
+                title=f"Beach Match {idx}",
+                description="Desc",
+                category=category,
+                event_date=timezone.now().date() + timedelta(days=1),
+                location="Seminyak",
+            )
+
+        response = client.get(
+            reverse("events:event_list"),
+            {
+                "q": "Beach",
+                "category": category.name,
+                "date_from": (timezone.now().date() + timedelta(days=1)).isoformat(),
+                "date_to": (timezone.now().date() + timedelta(days=3)).isoformat(),
+            },
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+
+        assert "page=2" in content
+        assert "q=Beach" in content
+        assert f"category={category.name}" in content
+        assert "date_from=" in content
+        assert "date_to=" in content
 
     def test_event_list_includes_mobile_filter_labels(self, client):
         response = client.get(reverse("events:event_list"))
@@ -522,6 +599,18 @@ class TestEventDiscoveryAndValidation:
         content = response.content.decode()
         assert 'data-mobile-event-detail="true"' in content
         assert 'data-mobile-rsvp-panel="true"' in content
+
+    def test_event_detail_includes_add_to_calendar_menu_marker(self, client, event):
+        response = client.get(reverse("events:event_detail", args=[event.slug]))
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert 'data-add-calendar-menu="true"' in content
+        assert "Add to Calendar" in content
+
+    def test_event_detail_has_no_emerald_dark_text_classes(self, client, event):
+        response = client.get(reverse("events:event_detail", args=[event.slug]))
+        assert response.status_code == 200
+        assert "dark:text-emerald-" not in response.content.decode()
 
     def test_home_includes_mobile_hero_marker(self, client):
         response = client.get(reverse("home"))
