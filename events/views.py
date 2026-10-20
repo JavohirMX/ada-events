@@ -375,21 +375,40 @@ def past_events(request):
     )
 
 
+def _ics_escape(value):
+    """Escape text per RFC 5545 section 3.3.11 so user input cannot add ICS lines."""
+    return (
+        str(value or "")
+        .replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\r\n", "\\n")
+        .replace("\n", "\\n")
+        .replace("\r", "\\n")
+    )
+
+
 def event_ics(request, slug):
     event = _get_event_by_slug_or_legacy_id(slug)
 
-    ics_content = f"""BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//ADA Events//EN
-BEGIN:VEVENT
-UID:{event.pk}@ada-events
-DTSTAMP:{timezone.now().strftime("%Y%m%dT%H%M%SZ")}
-DTSTART:{event.event_date.strftime("%Y%m%d")}{f"T{event.event_time.strftime('%H%M%S')}" if event.event_time else ""}
-SUMMARY:{event.title}
-DESCRIPTION:{event.description}
-LOCATION:{event.location}
-END:VEVENT
-END:VCALENDAR"""
+    dtstart = event.event_date.strftime("%Y%m%d")
+    if event.event_time:
+        dtstart += f"T{event.event_time.strftime('%H%M%S')}"
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//ADA Events//EN",
+        "BEGIN:VEVENT",
+        f"UID:{event.pk}@ada-events",
+        f"DTSTAMP:{timezone.now().strftime('%Y%m%dT%H%M%SZ')}",
+        f"DTSTART:{dtstart}",
+        f"SUMMARY:{_ics_escape(event.title)}",
+        f"DESCRIPTION:{_ics_escape(event.description)}",
+        f"LOCATION:{_ics_escape(event.location)}",
+        "END:VEVENT",
+        "END:VCALENDAR",
+    ]
+    ics_content = "\r\n".join(lines) + "\r\n"
 
     response = HttpResponse(ics_content, content_type="text/calendar")
     response["Content-Disposition"] = f"attachment; filename=event_{event.slug}.ics"
