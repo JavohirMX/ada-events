@@ -945,3 +945,41 @@ class TestSeedTestDataCommand:
         call_command("seed_test_data", "--users", "2", "--events", "2", "--reset")
 
         assert Event.objects.filter(title__startswith="Seed Event").count() == 2
+
+
+@pytest.mark.django_db
+class TestEventIcs:
+    def _event(self, user, category, **kw):
+        data = dict(
+            creator=user,
+            title="Demo Day",
+            description="Desc",
+            category=category,
+            event_date=timezone.now().date() + timedelta(days=1),
+            location="Hall A",
+        )
+        data.update(kw)
+        return Event.objects.create(**data)
+
+    def test_ics_escapes_user_text_and_cannot_inject_lines(self, client, user, category):
+        event = self._event(
+            user,
+            category,
+            title="Talk, Q&A; bring ID",
+            description="Line one\nATTENDEE:mailto:evil@example.com\nline two",
+        )
+        resp = client.get(reverse("events:event_ics", kwargs={"slug": event.slug}))
+        body = resp.content.decode()
+        lines = body.split("\r\n")
+        assert "SUMMARY:Talk\\, Q&A\\; bring ID" in lines
+        assert not any(line.startswith("ATTENDEE") for line in lines)
+        assert "DESCRIPTION:Line one\\nATTENDEE:mailto:evil@example.com\\nline two" in lines
+
+    def test_ics_uses_crlf_line_endings(self, client, user, category):
+        event = self._event(user, category)
+        body = client.get(
+            reverse("events:event_ics", kwargs={"slug": event.slug})
+        ).content.decode()
+        assert body.startswith("BEGIN:VCALENDAR\r\n")
+        assert body.endswith("END:VCALENDAR\r\n")
+        assert "\n" not in body.replace("\r\n", "")
